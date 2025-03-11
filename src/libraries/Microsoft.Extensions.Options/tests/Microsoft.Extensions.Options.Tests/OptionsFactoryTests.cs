@@ -170,9 +170,9 @@ namespace Microsoft.Extensions.Options.Tests
         [Fact]
         public void CanCreateOptionsFactory()
         {
-            var factory = new OptionsFactory<FakeOptions>(new IConfigureOptions<FakeOptions>[0],
+            var factory = new OptionsFactory<FakeOptions>(new InitializationOptions<FakeOptions>(), new IConfigureOptions<FakeOptions>[0],
                 new IPostConfigureOptions<FakeOptions>[] { });
-            
+
             Assert.Equal("", factory.Create("").Message);
         }
 

@@ -407,7 +407,7 @@ namespace Microsoft.Extensions.Options.Tests
                 }
             }
         }
-        
+
         public class ChangeTokenSource<T> : IOptionsChangeTokenSource<T>
         {
             private readonly IChangeToken _changeToken;
@@ -434,7 +434,7 @@ namespace Microsoft.Extensions.Options.Tests
 
             static OptionsMonitor<FakeOptions> CreateMonitor(IOptionsMonitorCache<FakeOptions> cache) =>
                 new OptionsMonitor<FakeOptions>(
-                    new OptionsFactory<FakeOptions>(Enumerable.Empty<IConfigureOptions<FakeOptions>>(), Enumerable.Empty<IPostConfigureOptions<FakeOptions>>()),
+                    new OptionsFactory<FakeOptions>(new InitializationOptions<FakeOptions>(), Enumerable.Empty<IConfigureOptions<FakeOptions>>(), Enumerable.Empty<IPostConfigureOptions<FakeOptions>>()),
                     Enumerable.Empty<IOptionsChangeTokenSource<FakeOptions>>(),
                     cache);
         }
@@ -498,7 +498,7 @@ namespace Microsoft.Extensions.Options.Tests
 
             OptionsMonitor<FakeOptions> monitor = new(
                 // WaitHandleConfigureOptions makes instance configuration slow enough to force a race condition
-                new OptionsFactory<FakeOptions>(new[] { new WaitHandleConfigureOptions(@event) }, Enumerable.Empty<IPostConfigureOptions<FakeOptions>>()),
+                new OptionsFactory<FakeOptions>(new InitializationOptions<FakeOptions>(), new[] { new WaitHandleConfigureOptions(@event) }, Enumerable.Empty<IPostConfigureOptions<FakeOptions>>()),
                 Enumerable.Empty<IOptionsChangeTokenSource<FakeOptions>>(),
                 new OptionsCache<FakeOptions>());
 

@@ -374,6 +374,24 @@ namespace Microsoft.Extensions.Options.Tests
             Assert.Equal("Named", optionsWithoutDefaultCtor.Name);
         }
 
+
+        [Fact]
+        public void Options_CanCreateInstancesWithoutDefaultCtorByInitializationOptions()
+        {
+            var services = new ServiceCollection();
+            services.Configure<OptionsWithoutDefaultCtor>("Named", options =>
+            {
+                options.Message = "Initial value";
+            });
+
+            services.AddSingleton<IInitializationOptions<OptionsWithoutDefaultCtor>, InitializationCustomOptions>();
+
+            var sp = services.BuildServiceProvider();
+            var optionsWithoutDefaultCtor = sp.GetRequiredService<IOptionsMonitor<OptionsWithoutDefaultCtor>>().Get("Named");
+            Assert.Equal("Initial value", optionsWithoutDefaultCtor.Message);
+            Assert.Equal("Named", optionsWithoutDefaultCtor.Name);
+        }
+
         [Fact]
         public void Options_WithoutDefaultCtor_ThrowDuringResolution()
         {
@@ -400,11 +418,19 @@ namespace Microsoft.Extensions.Options.Tests
 
         private class CustomOptionsFactory: OptionsFactory<OptionsWithoutDefaultCtor>
         {
-            public CustomOptionsFactory(IEnumerable<IConfigureOptions<OptionsWithoutDefaultCtor>> setups, IEnumerable<IPostConfigureOptions<OptionsWithoutDefaultCtor>> postConfigures, IEnumerable<IValidateOptions<OptionsWithoutDefaultCtor>> validations) : base(setups, postConfigures, validations)
+            public CustomOptionsFactory(IInitializationOptions<OptionsWithoutDefaultCtor> initialization, IEnumerable<IConfigureOptions<OptionsWithoutDefaultCtor>> setups, IEnumerable<IPostConfigureOptions<OptionsWithoutDefaultCtor>> postConfigures, IEnumerable<IValidateOptions<OptionsWithoutDefaultCtor>> validations) : base(initialization, setups, postConfigures, validations)
             {
             }
 
             protected override OptionsWithoutDefaultCtor CreateInstance(string name)
+            {
+                return new OptionsWithoutDefaultCtor(name);
+            }
+        }
+
+        private class InitializationCustomOptions : IInitializationOptions<OptionsWithoutDefaultCtor>
+        {
+            public OptionsWithoutDefaultCtor Initialize(string name)
             {
                 return new OptionsWithoutDefaultCtor(name);
             }
